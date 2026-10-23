@@ -1,5 +1,18 @@
+db.sqlite3
+# Environment and Python
+.env
+.venv/
 venv/
 __pycache__/
-*.pyc
-.env
-db.sqlite3
+*.py[cod]
+.pytest_cache/
+
+# Django generated files
+staticfiles/
+media/
+
+# Celery generated schedule files
+celerybeat-schedule*
+
+# Local development
+.vscode/
