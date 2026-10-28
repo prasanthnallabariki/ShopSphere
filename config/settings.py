@@ -238,3 +238,51 @@ if not DEBUG:
 
 #     SECURE_HSTS_SECONDS= 31536000
 #     SECURE_HSTS_INCLUDE_SUBDOMAINS= True
+
+
+# Production security settings
+SECURE_SSL_REDIRECT = (
+    os.environ.get("DJANGO_SECURE_SSL_REDIRECT", "False").lower() == "true"
+)
+
+SESSION_COOKIE_SECURE = (
+    os.environ.get("DJANGO_SESSION_COOKIE_SECURE", "False").lower() == "true"
+)
+
+CSRF_COOKIE_SECURE = (
+    os.environ.get("DJANGO_CSRF_COOKIE_SECURE", "False").lower() == "true"
+)
+
+SECURE_HSTS_SECONDS = int(
+    os.environ.get("DJANGO_SECURE_HSTS_SECONDS", "0")
+)
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = (
+    os.environ.get("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", "False").lower() == "true"
+)
+
+SECURE_HSTS_PRELOAD = (
+    os.environ.get("DJANGO_SECURE_HSTS_PRELOAD", "False").lower() == "true"
+)
+
+# Cloudflare Tunnel / reverse proxy
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "DJANGO_CSRF_TRUSTED_ORIGINS", ""
+    ).split(",")
+    if origin.strip()
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# def csrf_failure(request, reason=""):
+#     import logging
+#     logging.getLogger("django.security.csrf").error(
+#         "CSRF failure reason: %s | Origin: %s | Referer: %s",
+#         reason,
+#         request.META.get("HTTP_ORIGIN"),
+#         request.META.get("HTTP_REFERER"),
+#     )
+#     from django.http import HttpResponseForbidden
+#     return HttpResponseForbidden("CSRF verification failed. Check server logs.")
+# CSRF_FAILURE_VIEW = "config.settings.csrf_failure"

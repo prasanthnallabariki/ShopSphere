@@ -34,7 +34,7 @@ services:
       REDIS_URL: redis://redis:6379/1
       CELERY_BROKER_URL: redis://redis:6379/2
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -43,15 +43,12 @@ services:
     command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 2"
 
     healthcheck:
-      test:
-        - CMD
-        - python
-        - -c
-        - "import urllib.request; urllib.request.urlopen('http:''127.0.0.1:8000/admin/login/', timeout=3)"
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/admin/login/', timeout=3)"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 60s
+
   celery_worker:
     build: .
     env_file:

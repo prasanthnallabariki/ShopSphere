@@ -45,15 +45,21 @@ class OrderService:
     @staticmethod
     @transaction.atomic
     def cancel_order(order_id, user):
-        order= OrderRepository.get_order_for_update(order_id, user)
+        order = OrderRepository.get_order_for_update(order_id, user)
+
         if order.status != Order.Status.PENDING:
             raise ValidationError("Only pending orders can be cancelled")
-        for item in order.items.select_related("product"):
-            product= item.product
-            product.stock+= item.quantity
+
+        items = order.items.select_related("product")
+
+        for item in items:
+            product = item.product.__class__.objects.select_for_update().get(
+                pk=item.product_id
+            )
+            product.stock += item.quantity
             product.save(update_fields=["stock"])
-        order.status= Order.Status.CANCELLED
-        order.save(update_fields=["status"])
+
+        order.status = Order.Status.CANCELLED
+        order.save(update_fields=["status", "updated_at"])
+
         return order
-
-

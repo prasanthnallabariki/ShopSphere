@@ -32,6 +32,8 @@ class OrderDetailView(APIView):
         serializer= OrderSerializer(order)
         return Response(serializer.data, status= status.HTTP_200_OK)
 
+class OrderCancelView(APIView):
+    permission_classes= [IsAuthenticated]
     def post(self, request, order_id):
         order= OrderService.cancel_order(order_id, request.user)
         return Response({
